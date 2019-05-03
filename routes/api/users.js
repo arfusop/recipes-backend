@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("config");
 const { check, validationResult } = require("express-validator/check");
 
 const User = require("../../models/User");
@@ -24,7 +26,7 @@ router.post(
 		).isLength({ min: 6 })
 	],
 	async (req, res) => {
-    const errors = validationResult(req);
+		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
 		}
@@ -35,7 +37,9 @@ router.post(
 			// 1. See if user already exists
 			let user = await User.findOne({ email });
 			if (user) {
-				return res.status(400).json({ errors: [{ msg: "User already exists" }] });
+				return res
+					.status(400)
+					.json({ errors: [{ msg: "User already exists" }] });
 			}
 
 			user = new User({
@@ -47,13 +51,25 @@ router.post(
 
 			// 2. Encrypt password using Bcrypt
 			const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
-      await user.save();
+			user.password = await bcrypt.hash(password, salt);
+			await user.save();
 
 			// 3. Return json webtoken
+			const payload = {
+				user: {
+					id: user.id
+				}
+			};
 
-      // 4. DEBUG node error on submit of new user...
-			res.send("User registered");
+			jwt.sign(
+				payload,
+				config.get("jwtSecret"),
+				{ expiresIn: 3600000 },
+				(err, token) => {
+					if (err) throw err;
+					res.json({ token });
+				}
+			);
 		} catch (err) {
 			console.log(err.message);
 			res.status(500).send("Server Error");
