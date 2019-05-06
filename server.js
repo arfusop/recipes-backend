@@ -13,7 +13,7 @@ app.get("/", (req, res) => res.send("Api running."));
 
 // Define routes
 app.use("/api/users", require("./routes/api/users"));
-app.use("/api/profiles", require("./routes/api/profiles"));
+app.use("/api/profile", require("./routes/api/profile"));
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/recipes", require("./routes/api/recipes"));
 
