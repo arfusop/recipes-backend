@@ -50,8 +50,8 @@ router.post(
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
-    }
-    
+		}
+
 		const {
 			dob,
 			foodAllergies,
@@ -74,7 +74,7 @@ router.post(
 		}
 		if (diets) {
 			profileFields.diets = diets.split(",").map(diet => diet.trim());
-    }
+		}
 
 		try {
 			let profile = await Profile.findOne({ user: req.user.id });
@@ -85,7 +85,7 @@ router.post(
 					{ user: req.user.id },
 					{ $set: profileFields },
 					{ new: true }
-        );
+				);
 
 				return res.json(profile);
 			}
@@ -101,5 +101,22 @@ router.post(
 		}
 	}
 );
+
+// @route   GET api/profile
+// @desc    GET all profiles
+// @access  Public
+router.get("/", async (req, res) => {
+	try {
+		const profiles = await Profile.find().populate("user", [
+			"firstName",
+			"lastName"
+		]);
+
+		res.json(profiles);
+	} catch (err) {
+		console.error(err);
+		res.status(500).send("Server Error");
+	}
+});
 
 module.exports = router;
