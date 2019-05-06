@@ -75,11 +75,9 @@ router.post(
 		if (diets) {
 			profileFields.diets = diets.split(",").map(diet => diet.trim());
     }
-    
-    console.log(profileFields);
 
 		try {
-			let profile = Profile.findOne({ user: req.user.id });
+			let profile = await Profile.findOne({ user: req.user.id });
 
 			if (profile) {
 				// if profile exists, we want to update instead of create new
