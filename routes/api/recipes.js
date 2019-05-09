@@ -96,15 +96,71 @@ router.post(
 			newRecipe.keywords = keywords;
 			newRecipe.firstName = user.firstName;
 			newRecipe.lastName = user.lastName;
-      newRecipe.user = req.user.id;
-      
-      const recipe = await newRecipe.save();
-      res.json(recipe);
+			newRecipe.user = req.user.id;
+
+			const recipe = await newRecipe.save();
+			res.json(recipe);
 		} catch (error) {
 			console.error(err);
 			res.status(500).send("Server Error");
 		}
 	}
 );
+
+// @route   GET api/recipes
+// @desc    Get recipes
+// @access  Private
+router.get("/", auth, async (req, res) => {
+	try {
+		const recipes = await Recipes.find().sort({ date: -1 });
+		res.json(recipes);
+	} catch (err) {
+		console.error(err);
+		res.status(500).send("Server Error");
+	}
+});
+
+// @route   GET api/recipes/:id
+// @desc    Get single recipe by id
+// @access  Private
+router.get("/:id", auth, async (req, res) => {
+	try {
+		const recipe = await Recipes.findById(req.params.id);
+
+		if (!recipe) {
+			return res.status(404).json({ msg: "Recipe not found" });
+		}
+		res.json(recipe);
+	} catch (err) {
+		console.error(err);
+		if (err.kind === "ObjectId") {
+			return res.status(404).json({ msg: "Recipe not found" });
+		}
+		res.status(500).send("Server Error");
+	}
+});
+
+// @route   DELETE api/recipes/:id
+// @desc    Delete recipe by id
+// @access  Private
+router.delete("/:id", auth, async (req, res) => {
+	try {
+		const recipe = await Recipes.findById(req.params.id);
+
+		if (!recipe) {
+			return res.status(404).json({ msg: "Recipe not found" });
+		}
+
+		await recipe.remove();
+
+		res.json({ msg: "Recipe was successfully deleted" });
+	} catch (err) {
+		console.error(err);
+		if (err.kind === "ObjectId") {
+			return res.status(404).json({ msg: "Recipe not found" });
+		}
+		res.status(500).send("Server Error");
+	}
+});
 
 module.exports = router;
