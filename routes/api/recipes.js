@@ -140,6 +140,115 @@ router.get("/:id", auth, async (req, res) => {
 	}
 });
 
+// @route   POST api/recipes/:id
+// @desc    Edit recipe by id
+// @access  Private
+router.post(
+	"/edit/:id",
+	[
+		auth,
+		[
+			check("title", "A title is required")
+				.not()
+				.isEmpty(),
+			check("category", "A category is required")
+				.not()
+				.isEmpty(),
+			check("author", "An author is required")
+				.not()
+				.isEmpty(),
+			check("difficulty", "A difficulty level is required")
+				.not()
+				.isEmpty(),
+			check("prepTime", "Prep time is required")
+				.not()
+				.isEmpty(),
+			check("cookTime", "Cook time is required")
+				.not()
+				.isEmpty(),
+			check("servings", "Serving size is required")
+				.not()
+				.isEmpty(),
+			check("ingredients", "Ingredients are required")
+				.not()
+				.isEmpty(),
+			check("directions", "Directions are required")
+				.not()
+				.isEmpty(),
+			check("keywords", "Keywords are required")
+				.not()
+				.isEmpty()
+		]
+	],
+	async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
+		}
+		try {
+			const {
+				title,
+				category,
+				author,
+				favorite,
+				difficulty,
+				prepTime,
+				cookTime,
+				servings,
+				rating,
+				ingredients,
+				directions,
+				keywords,
+				reviews,
+				notes
+      } = req.body;
+			const updatedFields = {};
+			// not required fields
+			if (favorite) {
+				updatedFields.favorite = favorite;
+			} else {
+				updatedFields.favorite = false;
+			}
+			if (rating) updatedFields.rating = rating;
+			if (notes) updatedFields.notes = notes;
+			if (reviews) updatedFields.reviews = reviews;
+
+			// required fields
+			updatedFields.title = title;
+			updatedFields.category = category;
+			updatedFields.author = author;
+			updatedFields.difficulty = difficulty;
+			updatedFields.prepTime = prepTime;
+			updatedFields.cookTime = cookTime;
+			updatedFields.totalTime = prepTime + cookTime;
+			updatedFields.servings = servings;
+			updatedFields.ingredients = ingredients;
+			updatedFields.directions = directions;
+			updatedFields.keywords = keywords;
+
+      let recipe = Recipes.findOne({ recipe: req.user.id });
+			if (recipe) {
+				recipe = await Recipes.findOneAndUpdate(
+					{ recipes: req.user.id },
+					{ $set: updatedFields },
+					{ new: true }
+        );
+
+        console.log(recipe)
+				return res.json(recipe);
+      }
+      
+			res.status(400).json({ msg: "Recipe not found" });
+		} catch (err) {
+			console.error(err);
+			if (err.kind === "ObjectId") {
+				return res.status(404).json({ msg: "Recipe not found" });
+			}
+			res.status(500).send("Server Error");
+		}
+	}
+);
+
 // @route   DELETE api/recipes/:id
 // @desc    Delete recipe by id
 // @access  Private
