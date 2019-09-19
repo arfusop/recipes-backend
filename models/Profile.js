@@ -26,6 +26,10 @@ const ProfileSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	profilePic: {
+		small: String,
+		large: String,
+	},
 	date: {
 		type: Date,
 		default: Date.now

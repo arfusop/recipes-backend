@@ -61,6 +61,10 @@ const RecipeSchema = new mongoose.Schema({
   reviews: {
     type: Array,
   },
+  recipePic: {
+    small: String,
+    large: String,
+  }
 });
 
 module.exports = User = mongoose.model('recipes', RecipeSchema);

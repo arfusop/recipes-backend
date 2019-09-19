@@ -68,7 +68,8 @@ router.post(
 				directions,
 				keywords,
 				reviews,
-				notes
+				notes,
+				recipePic,
 			} = req.body;
 
 			const newRecipe = new Recipes({});
@@ -94,6 +95,7 @@ router.post(
 			newRecipe.ingredients = ingredients;
 			newRecipe.directions = directions;
 			newRecipe.keywords = keywords;
+			newRecipe.recipePic = recipePic;
 			newRecipe.firstName = user.firstName;
 			newRecipe.lastName = user.lastName;
 			newRecipe.user = req.user.id;

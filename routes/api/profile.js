@@ -58,7 +58,8 @@ router.post(
 			diets,
 			cookingSkill,
 			houseHoldSize,
-			gender
+			gender,
+			profilePic
 		} = req.body;
 
 		const profileFields = {};
@@ -67,6 +68,7 @@ router.post(
 		profileFields.dob = dob;
 		profileFields.houseHoldSize = houseHoldSize;
 		profileFields.gender = gender;
+		profileFields.profilePic = profilePic;
 		if (foodAllergies) {
 			profileFields.foodAllergies = foodAllergies
 				.split(",")
