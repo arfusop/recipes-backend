@@ -1,4 +1,0 @@
-{
-	"mongoURI": "mongodb+srv://phil123:phil123@recipes-db-gnvzn.mongodb.net/test?retryWrites=true",
-	"jwtSecret": "kookies123"
-}
